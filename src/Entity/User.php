@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use DateTimeZone;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -40,9 +42,14 @@ class User
     private $password;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $birthday;
+
+    /**
+     * @ORM\OneToOne(targetEntity=TodoList::class, mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $todoList;
 
     public function __construct(string $firstname, string $lastname, string $email, string $password, string $birthday)
     {
@@ -55,8 +62,8 @@ class User
 
     public function isValid(): bool
     {
-        $date = new DateTime($this->birthday);
-        $today = new DateTime();
+        $date = new DateTime($this->birthday,new DateTimeZone('Europe/Paris'));
+        $today = new DateTime('now',new DateTimeZone('Europe/Paris'));
         $age = $date->diff($today)->y;
 
         return !empty($this->firstname)
@@ -123,14 +130,31 @@ class User
         return $this;
     }
 
-    public function getBirthday(): ?string
+    public function getBirthday()
     {
         return $this->birthday;
     }
 
-    public function setBirthday(string $birthday): self
+    public function setBirthday($birthday): self
     {
         $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getTodoList(): ?TodoList
+    {
+        return $this->todoList;
+    }
+
+    public function setTodoList(TodoList $todoList): self
+    {
+        // set the owning side of the relation if necessary
+        if ($todoList->getUser() !== $this) {
+            $todoList->setUser($this);
+        }
+
+        $this->todoList = $todoList;
 
         return $this;
     }
