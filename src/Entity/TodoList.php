@@ -94,7 +94,8 @@ class TodoList
     protected function sendEmailUser()
     {
         $emailService = new EmailService();
-        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(),\Swift_Mailer::class);
+        $mailer = new \Swift_Mailer();
+        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(), $mailer);
     }
 
     protected function getLastItem()
