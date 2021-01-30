@@ -35,6 +35,7 @@ class TestController extends AbstractController
         if($difference > '02:30'){
             echo "bjr";
         }
-        return $this->render('test/index.html.twig');
+
+        //return $this->render('test/index.html.twig');
     }
 }

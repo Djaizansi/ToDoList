@@ -51,18 +51,18 @@ class User
      */
     private $todoList;
 
-    public function __construct(string $firstname, string $lastname, string $email, string $password, string $birthday)
+    public function __construct(string $firstname=null, string $lastname=null, string $email=null, string $password=null, string $birthday=null)
     {
-        $this->email = $email;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
+        $this->email = $email;
         $this->password = $password;
-        $this->birthday = $birthday;
+        $this->birthday = new DateTime($birthday,new DateTimeZone('Europe/Paris'));
     }
 
     public function isValid(): bool
     {
-        $date = new DateTime($this->birthday,new DateTimeZone('Europe/Paris'));
+        $date = $this->birthday;
         $today = new DateTime('now',new DateTimeZone('Europe/Paris'));
         $age = $date->diff($today)->y;
 
