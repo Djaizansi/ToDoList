@@ -62,9 +62,11 @@ class User
 
     public function isValid(): bool
     {
-        $date = $this->birthday;
-        $today = new DateTime('now',new DateTimeZone('Europe/Paris'));
-        $age = $date->diff($today)->y;
+        if(!is_null($this->birthday)){
+            $date = $this->birthday;
+            $today = new DateTime('now',new DateTimeZone('Europe/Paris'));
+            $age = $date->diff($today)->y;
+        }
 
         return !empty($this->firstname)
             && !empty($this->lastname)

@@ -3,7 +3,6 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Validator\Constraints\Date;
 
 class UserControllerTest extends WebTestCase
 {
@@ -45,7 +44,6 @@ class UserControllerTest extends WebTestCase
     {
         $this->client->request('POST', '/register',$this->user);
         $content = json_decode($this->client->getResponse()->getContent())->title;
-        dd($content, $this->client->getResponse()->getStatusCode());
         $this->assertEquals(201, $this->client->getResponse()->getStatusCode());
         $this->assertEquals("L'utilisateur a bien été crée", $content);
     }

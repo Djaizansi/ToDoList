@@ -47,7 +47,7 @@ class TodoList
         return !empty($this->name)
             && !empty($this->user)
             && strlen($this->name) <= 255
-            && is_null($this->description) || strlen($this->description) <= 255;
+            && (is_null($this->description) || strlen($this->description) <= 255);
     }
 
     public function canAddItem(Item $item)
