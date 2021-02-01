@@ -18,7 +18,7 @@ class Item
     private $id;
 
     /**
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
     private $name;
 
@@ -38,7 +38,7 @@ class Item
      */
     private $todoList;
 
-    public function __construct($name, $content, $createdAt)
+    public function __construct($name=null, $content=null, $createdAt=null)
     {
         $this->name = $name;
         $this->content = $content;

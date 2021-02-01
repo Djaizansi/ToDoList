@@ -22,12 +22,6 @@ class TodoList
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="todoList", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="todoList", orphanRemoval=true)
      */
     private $item;
@@ -38,9 +32,14 @@ class TodoList
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $description;
+
+    /**
+     * @ORM\OneToOne(targetEntity=User::class, inversedBy="todoList")
+     */
+    private $user;
 
     public function isValid(): bool
     {
@@ -52,9 +51,8 @@ class TodoList
 
     public function canAddItem(Item $item)
     {
-        $today = new DateTime();
+        $today = new DateTime('now');
         $lastItem = $this->getLastItem();
-
         $diffDate = $today->diff($lastItem->getCreatedAt());
         $outputMinute = $diffDate->format('%H:%I');
 
@@ -62,7 +60,7 @@ class TodoList
             throw new Exception('L\'item est nul ou invalide');
         }
 
-        if(is_null($this->user) || !$this->user->isValid())
+        if(is_null($this->user))
         {
             throw new Exception('L\'utilisateur est nul ou invalide');
         }
@@ -113,18 +111,6 @@ class TodoList
         return $this->id;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Item[]
      */
@@ -165,6 +151,18 @@ class TodoList
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

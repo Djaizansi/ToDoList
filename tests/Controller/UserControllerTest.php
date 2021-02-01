@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Service\HelpersService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UserControllerTest extends WebTestCase
@@ -13,22 +14,8 @@ class UserControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $today = new \DateTime('now');
-        $birthday = $today->sub(new \DateInterval('P30Y'))->format('Y-m-d');
-
-        $arrayOfFirstname = ['Youcef','Marwane','Khalil','Clara','Djaizansi'];
-        $arrayOfDomain = ['hotmail','yahoo','gmail','youcef','yopmail'];
-
-        //Melange les elements des tableaux
-        shuffle($arrayOfDomain);
-        shuffle($arrayOfFirstname);
-
-        //Formation de l'email random car unique
-        $keyF = array_rand($arrayOfFirstname,1);
-        $keyD = array_rand($arrayOfDomain,1);
-        $randomInt = random_int(1, 1000);
-
-        $emailRandom = $arrayOfFirstname[$keyF].$randomInt.'@'.$arrayOfDomain[$keyD].'.com';
+        $emailRandom = HelpersService::createEmailRandom();
+        $birthday = HelpersService::createOldBirthday();
 
         $this->user = [
             'lastname' => 'Jallali',
@@ -65,5 +52,12 @@ class UserControllerTest extends WebTestCase
         $content = json_decode($this->client->getResponse()->getContent())->title;
         $this->assertEquals(500, $this->client->getResponse()->getStatusCode());
         $this->assertEquals("L'utilisateur n'est pas valide", $content);
+    }
+
+    public function testConnexionSuccess()
+    {
+        $myUser = ['email' => 'youcef.jallali@gmail.com','password'=>'azertyuiop'];
+        $this->client->request('POST', '/login', $myUser);
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
     }
 }

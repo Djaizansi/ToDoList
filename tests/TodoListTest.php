@@ -8,7 +8,6 @@ use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateInterval;
-use DateTimeZone;
 
 class TodoListTest extends TestCase
 {
@@ -20,8 +19,8 @@ class TodoListTest extends TestCase
     {
         parent::setUp();
 
-        $today = new DateTime('now', new DateTimeZone('Europe/Paris'));
-        $myToday = new DateTime('now', new DateTimeZone('Europe/Paris'));
+        $today = new DateTime('now');
+        $myToday = new DateTime('now');
         $birthday = $today->sub(new DateInterval('P30Y'))->format('Y-m-d');
         $createdItemAt = $myToday->add(new DateInterval('PT45M'));
 
