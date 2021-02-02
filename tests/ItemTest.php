@@ -15,7 +15,7 @@ class ItemTest extends TestCase
     {
         parent::setUp();
 
-        $today = new DateTime('now');
+        $today = new DateTime('now',new \DateTimeZone('Europe/Paris'));
         $createdItemAt = $today->add(new DateInterval('PT45M'));
 
         $this->item = new Item(

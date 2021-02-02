@@ -19,8 +19,9 @@ class TodoListTest extends TestCase
     {
         parent::setUp();
 
-        $today = new DateTime('now');
-        $myToday = new DateTime('now');
+        $today = new DateTime('now',new \DateTimeZone('Europe/Paris'));
+        $myToday = new DateTime('now',new \DateTimeZone('Europe/Paris'));
+        $dateMock = new DateTime('now',new \DateTimeZone('Europe/Paris'));
         $birthday = $today->sub(new DateInterval('P30Y'))->format('Y-m-d');
         $createdItemAt = $myToday->add(new DateInterval('PT45M'));
 
@@ -29,7 +30,7 @@ class TodoListTest extends TestCase
             'Youcef',
             'youcef.jallali@gmail.com',
             'azfezfez3',
-            "$birthday"
+            $birthday
         );
 
         $this->item = new Item(
@@ -38,31 +39,27 @@ class TodoListTest extends TestCase
             $createdItemAt
         );
 
+        $unItem = new Item(
+            'Mock',
+            'petit exercice à faire pour les vacances',
+            $dateMock
+        );
+
         $this->todolist = $this->getMockBuilder(TodoList::class)
-            ->onlyMethods(['getSizeTodoList','getLastItem','sendEmailUser'])
+            ->onlyMethods(['getSizeTodoList','getLastItem'])
             ->getMock();
 
+        $this->todolist->expects($this->any())->method('getLastItem')->willReturn($unItem);
         $this->todolist->setUser($this->user);
-        $this->todolist->expects($this->any())->method('getLastItem')->willReturn($this->item);
     }
 
     public function testCanAddItemNominal()
     {
         $this->todolist->expects($this->any())->method('getSizeTodoList')->willReturn('1');
-
         $canAddItem = $this->todolist->canAddItem($this->item);
 
         $this->assertNotNull($canAddItem);
         $this->assertEquals('Exercice1 à faire', $canAddItem->getName());
-    }
-
-    public function testSendEmailToUser()
-    {
-        $this->todolist->expects($this->once())->method('getSizeTodoList')->willReturn('8');
-
-        $send = $this->todolist->numberItemAlert();
-
-        $this->assertTrue($send);
     }
 
     public function testCanAddMaxItem()

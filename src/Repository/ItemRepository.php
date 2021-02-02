@@ -19,22 +19,21 @@ class ItemRepository extends ServiceEntityRepository
         parent::__construct($registry, Item::class);
     }
 
-    // /**
+    // /** SELECT * FROM item i INNER JOIN todo_list td ON i.todo_list_id = td.id ORDER BY created_at DESC LIMIT 1 */
     //  * @return Item[] Returns an array of Item objects
     //  */
-    /*
-    public function findByExampleField($value)
+
+    public function getLastItem($id)
     {
         return $this->createQueryBuilder('i')
-            ->andWhere('i.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('i.id', 'ASC')
-            ->setMaxResults(10)
+            ->where('i.todoList = :id')
+            ->orderBy('i.createdAt', 'DESC')
+            ->setParameter('id',$id)
+            ->setMaxResults(1)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Item

@@ -7,6 +7,7 @@ use App\Entity\Item;
 use App\Entity\TodoList;
 use App\Form\ItemType;
 use App\Form\TodoListType;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,22 +58,22 @@ class TodoListController extends AbstractController
     /**
      * @Route("/todolist/add/item", name="api_add_item_todolist", methods={"POST"})
      */
-    public function addItemToList(Request $request, EntityManagerInterface $em)
+    public function addItemToList(Request $request, EntityManagerInterface $em, EmailService $emailService)
     {
         //Utilisateur connecté ?
         if(!$this->getUser()) return new JsonResponse($this->getArrayMessage("L'utilisateur n'est pas connecté ou n'existe pas", 500),500);
-
         //Recuperer la todolist de l'utilisateur
         $userTodoList = $this->getUser()->getTodolist();
         //Création de l'item
         $item = new Item();
-        $form = $this->createForm(ItemType::class,$item);
+        $form = $this->createForm(ItemType::class);
         $form->submit($request->request->all());
 
         if($form->isValid()){
-            $item = $form->getData();
-            $item->setCreatedAt(new \DateTime('now'));
-
+            $item->setName($form->getData()['name']);
+            $item->setContent($form->getData()['content']);
+            $hours = isset($form->getData()['createdAt']) ? $form->getData()['createdAt'] : 'now';
+            $item->setCreatedAt(new \DateTime($hours,new \DateTimeZone('Europe/Paris')));
             //Check if item's name alreayExist
             $alreadyExist = $em->getRepository(Item::class)->findBy(['name' => $item->getName()]);
             if(!empty($alreadyExist)){
@@ -83,13 +84,15 @@ class TodoListController extends AbstractController
                 return new JsonResponse($this->getArrayMessage("L'item n'est pas valide", 500),500);
             }
             //Check if at least one item exist
-            $itemInDb = count($em->getRepository(Item::class)->findAll());
-
+            $itemInDb = count($userTodoList->getItem()->getValues());
             if($itemInDb > 0){
                 //Vérifier si on peut ajouter l'item à la todolist
                 $todolist = $userTodoList;
                 try {
                     $todolist->canAddItem($item);
+                    if($itemInDb >= 8){
+                        $emailService->sendMail('Alert Todolist','Il ne vous reste plus que 2 items à ajouter',$this->getUser()->getEmail());
+                    }
                 }catch(\Exception $e) {
                     return new JsonResponse($this->getArrayMessage($e->getMessage(), 500),500);
                 }

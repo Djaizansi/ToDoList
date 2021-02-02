@@ -51,9 +51,10 @@ class TodoList
 
     public function canAddItem(Item $item)
     {
-        $today = new DateTime('now');
+        $itemActualDate = $item->getCreatedAt();
         $lastItem = $this->getLastItem();
-        $diffDate = $today->diff($lastItem->getCreatedAt());
+        $dateLastItem = new DateTime($lastItem->getCreatedAt()->format("Y-m-d H:i:s"),new \DateTimeZone('Europe/Paris'));
+        $diffDate = $itemActualDate->diff($dateLastItem);
         $outputMinute = $diffDate->format('%H:%I');
 
         if(is_null($item) || !$item->isValid()){
@@ -75,25 +76,7 @@ class TodoList
             throw new Exception('Le dernier item est récent. Veuillez respecter les 30 minutes d\'écart');
         }
 
-        $this->numberItemAlert();
-
         return $item;
-    }
-
-    public function numberItemAlert()
-    {
-        if($this->getSizeTodoList() == 8)
-        {
-            $this->sendEmailUser();
-            return true;
-        }
-    }
-
-    protected function sendEmailUser()
-    {
-        $emailService = new EmailService();
-        $mailer = new \Swift_Mailer();
-        $emailService->sendMail('Il vous reste 2 items',$this->user->getEmail(), $mailer);
     }
 
     protected function getLastItem()

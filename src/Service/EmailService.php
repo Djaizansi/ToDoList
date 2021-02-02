@@ -6,13 +6,19 @@ use Swift_Mailer;
 
 class EmailService
 {
-    public function sendMail(string $message, string $email, Swift_Mailer $mailer)
+    private $mailer;
+
+    public function __construct(Swift_Mailer $mailer){
+        $this->mailer = $mailer;
+    }
+
+    public function sendMail(string $title, string $message, string $email)
     {
-        $myEmail = (new Swift_Message('Alert TodoList'))
-            ->setFrom('send@example.com')
+        $myEmail = (new \Swift_Message($title))
+            ->setFrom('assobookpa@gmail.com')
             ->setTo($email)
             ->setBody($message);
-
-        $mailer->send($myEmail);
+        //Send Swift_Message Object
+        $this->mailer->send($myEmail);
     }
 }
